@@ -114,6 +114,5 @@ def test_division():
         e3 = e1 / e2
 
 
-
 def test_exponentiation():
     pass
