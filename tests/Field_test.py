@@ -115,4 +115,14 @@ def test_division():
 
 
 def test_exponentiation():
-    pass
+    e1 = Field.FieldElement(7, 17)
+    e2 = Field.FieldElement(11, 17)
+    e3 = Field.FieldElement(3, 17)
+    assert (e1**5) == e2
+    assert not (e1**5) == e3
+
+    e1 = Field.FieldElement(17, 31)
+    e2 = Field.FieldElement(29, 31)
+    e3 = Field.FieldElement(3, 31)
+    assert (e1**-3) == e2
+    assert not (e1**-3) == e3
