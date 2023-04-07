@@ -12,5 +12,3 @@ logs
 share
 
 pyvenv.cfg
-
-test.py
