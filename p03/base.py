@@ -123,3 +123,25 @@ class Point:
         return self.__class__(x=new_x, y=new_y, a=self.a, b=self.b)
 
 
+import unittest
+
+class UnitTest(unittest.TestCase):
+
+    def test_point_on_curve(self):
+        prime = 223
+        a = FieldElement(0, prime)
+        b = FieldElement(7, prime)
+
+        valid_points = [(192, 105), (17, 56), (1, 193)]
+        invalid_points = [(200, 119), (42, 99)]
+
+        for x_raw, y_raw in valid_points:
+            x = FieldElement(num=x_raw, prime=prime)
+            y = FieldElement(num=y_raw, prime=prime)
+            Point(x=x, y=y, a=a, b=b)
+
+        for x_raw, y_raw in invalid_points:
+            x = FieldElement(num=x_raw, prime=prime)
+            y = FieldElement(num=y_raw, prime=prime)
+            with self.assertRaises(ValueError):
+                Point(x=x, y=y, a=a, b=b)
