@@ -39,7 +39,7 @@ class Point:
             return self
         
         if self.x == __value.x: # Bot points are on the same X
-            if self.y == __value.y:
+            if self.y == __value.y: # Bot points are on the same Y
                 if (self.y == 0) and (__value.y == 0): # Both poins have Y == 0
                     return self.__class__(x=None, y=None, a=self.a, b=self.b)
                 else: # A + A = B
