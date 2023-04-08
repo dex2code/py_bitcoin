@@ -12,21 +12,21 @@ class FieldElement:
         return f"FieldElement_{self.prime} ({self.num})"
     
 
-    def __eq__(self, __value: object) -> bool:
+    def __eq__(self, __value) -> bool:
         if __value is None:
             return False
         
         return (self.num == __value.num) and (self.prime == __value.prime)
     
     
-    def __ne__(self, __value: object) -> bool:
+    def __ne__(self, __value) -> bool:
         if __value is None:
             return True
         
         return not (self == __value)
     
 
-    def __add__(self, __value: object) -> object:
+    def __add__(self, __value) -> object:
         if self.prime != __value.prime:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
         
@@ -34,7 +34,7 @@ class FieldElement:
         return self.__class__(num=new_num, prime=self.prime)
 
 
-    def __sub__(self, __value: object) -> object:
+    def __sub__(self, __value) -> object:
         if self.prime != __value.prime:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
         
@@ -42,7 +42,7 @@ class FieldElement:
         return self.__class__(num=new_num, prime=self.prime)
     
 
-    def __mul__(self, __value: object) -> object:
+    def __mul__(self, __value) -> object:
         if self.prime != __value.prime:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
 
@@ -50,7 +50,7 @@ class FieldElement:
         return self.__class__(num=new_num, prime=self.prime)
     
 
-    def __truediv__(self, __value: object) -> object:
+    def __truediv__(self, __value) -> object:
         if self.prime != __value.prime:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
         
@@ -65,3 +65,7 @@ class FieldElement:
         __value = __value % (self.prime - 1)
         new_num = pow(base=self.num, exp=__value, mod=self.prime)
         return self.__class__(num=new_num, prime=self.prime)
+
+
+if __name__ == "__main__":
+    pass

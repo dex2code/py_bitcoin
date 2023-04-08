@@ -20,15 +20,15 @@ class Point:
         return f"Point ({self.x}, {self.y}) on curve 'x**3 + {self.a}x + {self.b}'"
 
 
-    def __eq__(self, __value: object) -> bool:
+    def __eq__(self, __value) -> bool:
         return (self.x == __value.x) and (self.y == __value.y) and (self.a == __value.a) and (self.b == __value.b)
 
 
-    def __ne__(self, __value: object) -> bool:
+    def __ne__(self, __value) -> bool:
         return not (self == __value)
     
 
-    def __add__(self, __value: object) -> object:
+    def __add__(self, __value) -> object:
         if (self.a != __value.a) or (self.b != __value.b):
             raise TypeError(f"Given points ('{self}' and '{__value}') aren't on the same curve!")
         
@@ -52,3 +52,7 @@ class Point:
         new_x = pow(s, 2) - self.x - __value.x
         new_y = s * (self.x - new_x) - self.y
         return self.__class__(x=new_x, y=new_y, a=self.a, b=self.b)
+
+
+if __name__ == "__main__":
+    pass

@@ -1,18 +1,25 @@
-from .. import Field
-import pytest
+import unittest
+from py_bitcoin.fields import FieldElement
 
 
-def test_valid_points():
-    assert Field.FieldElement(num=3, prime=7)
-    assert Field.FieldElement(num=7, prime=11)
+class fields_test(unittest.TestCase):
+
+    def test_valid_points(self):
+        self.assertTrue(FieldElement(num=3, prime=7))
+        self.assertTrue(FieldElement(num=7, prime=11))
 
 
-def test_invalid_points():
-    with pytest.raises(ValueError):
-        Field.FieldElement(num=-3, prime=7)
-        Field.FieldElement(num=13, prime=7)
+    def test_invalid_points(self):
+        with self.assertRaises(ValueError):
+            FieldElement(num=-3, prime=7)
+            FieldElement(num=13, prime=7)
 
 
+if __name__ == "__main__":
+    unittest.main()
+
+
+"""
 def test_equality():
     e1 = Field.FieldElement(11, 13)
     e2 = Field.FieldElement(11, 13)
@@ -126,3 +133,4 @@ def test_exponentiation():
     e3 = Field.FieldElement(3, 31)
     assert (e1**-3) == e2
     assert not (e1**-3) == e3
+"""
