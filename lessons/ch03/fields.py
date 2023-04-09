@@ -34,6 +34,11 @@ class FieldElement:
         return self.__class__(num=new_num, prime=self.prime)
 
 
+    def __radd__(self, __value) -> object:
+        new_num = (self.num + __value) % self.prime
+        return self.__class__(num=new_num, prime=self.prime)
+
+
     def __sub__(self, __value) -> object:
         if self.prime != __value.prime:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")

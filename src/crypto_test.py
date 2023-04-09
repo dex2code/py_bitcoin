@@ -30,9 +30,9 @@ class CryptoTest(unittest.TestCase):
         a = FieldElement(num=0, prime=prime)
         b = FieldElement(num=7, prime=prime)
 
-        left_points = [(170, 142), (47, 71), (143, 98)]
-        right_points = [(60, 139), (17, 56), (76, 66)]
-        check_points = [(220, 181), (215, 68), (47, 71)]
+        left_points = [(47, 71), (170, 142), (47, 71), (143, 98)]
+        right_points = [(47, 71), (60, 139), (17, 56), (76, 66)]
+        check_points = [(36, 111), (220, 181), (215, 68), (47, 71)]
 
         for point_left, point_right, point_check in zip(left_points, right_points, check_points):
             x_raw_left = point_left[0]

@@ -54,5 +54,18 @@ class Point:
         return self.__class__(x=new_x, y=new_y, a=self.a, b=self.b)
 
 
+    def __rmul__(self, __value) -> object:
+        cff = __value
+        cur = self
+        result = self.__class__(x=None, y=None, a=self.a, b=self.b)
+
+        while cff:
+            if cff & 1:
+                result += cur
+            cur += cur
+            cff >>= 1
+        return result
+
+
 if __name__ == "__main__":
     pass
