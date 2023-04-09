@@ -1,23 +1,13 @@
-from fields import FieldElement
-from curves import Point
+import os, sys
 
-"""
-prime = 221
-a = FieldElement(num=0,  prime=prime)
-b = FieldElement(num=7,  prime=prime)
-x = FieldElement(num=47, prime=prime)
-y = FieldElement(num=71, prime=prime)
-
-p = Point(x=x, y=y, a=a, b=b)
-
-for s in range(1, 23):
-    res = s * p
-
-    print(f"{s} * (47, 71) == ({res.x}, {res.y})")
-"""
+parent = os.path.abspath('.')
+sys.path.insert(1, parent)
 
 
-e1 = FieldElement(num=0, prime=17)
+from src.py_bitcoin.curves import Point
+from src.py_bitcoin.fields import FieldElement
 
-for i in range(25):
-    print(i + e1)
+
+print(FieldElement(7, 11))
+
+
