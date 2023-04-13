@@ -77,5 +77,14 @@ class FieldElement:
         return self.__class__(num=new_num, prime=self.prime)
 
 
+from . import S256_PRIME
+
+
+class S256_Field(FieldElement):
+
+    def __init__(self, num, prime=None):
+        super().__init__(num=num, prime=S256_PRIME)
+
+
 if __name__ == "__main__":
     pass

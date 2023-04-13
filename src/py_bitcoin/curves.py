@@ -55,16 +55,35 @@ class Point:
 
 
     def __rmul__(self, __value) -> object:
-        cff = __value
-        cur = self
+        coeff = __value
+        current = self
         result = self.__class__(x=None, y=None, a=self.a, b=self.b)
 
-        while cff:
-            if cff & 1:
-                result += cur
-            cur += cur
-            cff >>= 1
+        while coeff:
+            if coeff & 1:
+                result += current
+            current += current
+            coeff >>= 1
+
         return result
+
+
+from . import S256_A, S256_B, S256_N
+from .fields import S256_Field
+
+
+class S256_Point(Point):
+
+    def __init__(self, x, y, a=None, b=None) -> None:
+        if type(x) == int:
+            super().__init__(x=S256_Field(x), y=S256_Field(y), a=S256_Field(S256_A), b=S256_Field(S256_B))
+        else:
+            super().__init__(x=x, y=y, a=S256_Field(S256_A), b=S256_Field(S256_B))
+    
+
+    def __rmul__(self, __value) -> object:
+        coeff = __value % S256_N
+        return super().__rmul__(coeff)
 
 
 if __name__ == "__main__":
