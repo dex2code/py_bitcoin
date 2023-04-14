@@ -9,7 +9,7 @@ class FieldElement:
 
 
     def __repr__(self) -> str:
-        return f"FieldElement_{self.prime} ({self.num})"
+        return f"FE_'{self.num}'_'{self.prime}'"
     
 
     def __eq__(self, __value) -> bool:
@@ -80,10 +80,14 @@ class FieldElement:
 from . import S256_PRIME
 
 
-class S256_Field(FieldElement):
+class S256_FieldElement(FieldElement):
 
     def __init__(self, num, prime=None):
         super().__init__(num=num, prime=S256_PRIME)
+
+
+    def __repr__(self):
+        return f"S256_FE_'{str(self.num).zfill(64)}'"
 
 
 if __name__ == "__main__":

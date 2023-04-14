@@ -10,14 +10,14 @@ class Point:
             return
         
         if y**2 != x**3 + (a * x) + b:
-            raise ValueError(f"Point ({x}, {y}) is not on the curve 'x**3 + {a}x + {b}'")
+            raise ValueError(f"Point ({x}, {y}) is not on the curve 'x**3 + {a}*x + {b}'")
 
 
     def __repr__(self) -> str:
         if (self.x is None) and (self.y is None):
-            return f"Infinity Point on curve 'x**3 + {self.a}x + {self.b}'"
+            return f"P_(I) on 'x**3 + {self.a}*x + {self.b}'"
 
-        return f"Point ({self.x}, {self.y}) on curve 'x**3 + {self.a}x + {self.b}'"
+        return f"P_({self.x}, {self.y}) on 'x**3 + {self.a}*x + {self.b}'"
 
 
     def __eq__(self, __value) -> bool:
@@ -61,25 +61,33 @@ class Point:
 
         while coeff:
             if coeff & 1:
-                result += current
-            current += current
+                result = result + current
+
+            current = current + current
             coeff >>= 1
 
         return result
 
 
 from . import S256_A, S256_B, S256_N
-from .fields import S256_Field
+from .fields import S256_FieldElement
 
 
 class S256_Point(Point):
 
     def __init__(self, x, y, a=None, b=None) -> None:
         if type(x) == int:
-            super().__init__(x=S256_Field(x), y=S256_Field(y), a=S256_Field(S256_A), b=S256_Field(S256_B))
+            super().__init__(x=S256_FieldElement(x), y=S256_FieldElement(y), a=S256_FieldElement(S256_A), b=S256_FieldElement(S256_B))
         else:
-            super().__init__(x=x, y=y, a=S256_Field(S256_A), b=S256_Field(S256_B))
-    
+            super().__init__(x=x, y=y, a=S256_FieldElement(S256_A), b=S256_FieldElement(S256_B))
+
+
+    def __repr__(self) -> str:
+        if (self.x is None) and (self.y is None):
+            return f"S256_P_(I)"
+
+        return f"S256_P_({self.x}, {self.y})"
+
 
     def __rmul__(self, __value) -> object:
         coeff = __value % S256_N

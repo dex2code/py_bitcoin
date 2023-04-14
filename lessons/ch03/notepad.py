@@ -5,7 +5,7 @@ sys.path.insert(1, parent)
 
 
 from src.py_bitcoin.curves import Point, S256_Point
-from src.py_bitcoin.fields import FieldElement, S256_Field
+from src.py_bitcoin.fields import FieldElement, S256_FieldElement
 
 """
 prime = 223
@@ -64,9 +64,14 @@ while coeff:
 
 """
 
-e1 = S256_Field(num=13)
+e1 = S256_FieldElement(num=13)
 print(e1)
 
-from src.py_bitcoin import S256_N, S256_G
+e1 = FieldElement(num=13, prime=17)
+print(e1)
+
+from src.py_bitcoin import S256_N, S256_Gx, S256_Gy
+
+S256_G = S256_Point(S256_Gx, S256_Gy)
 
 print(S256_N * S256_G)
