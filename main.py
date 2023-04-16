@@ -88,7 +88,7 @@ my_keys = NewKeys() # Generate _random_ secret and public keys
 print("0x"+"{:x}".format(my_keys.private_key).zfill(64)) # 0x73bd65f5dece82838c02aed103aa05bbc174bb46cc3ae42632da60740c15aa1f
 print(my_keys.public_key) # S256_P_(S256_FE_0x79404d7138fb5c37dd3b527ac15933863ce15f520b8c4c8ac8f26b6e3c4860e7, S256_FE_0x5c1a296cc2bbb50fa4b74d859677e9720bde35ed2ba1a5c99465b16706cc5c4b)
 
-my_keys = NewKeys(secret="My strongest secret ever!")
+my_keys = NewKeys(secret="My strongest secret ever!") # Or you can generate predefined keys
 print("0x"+"{:x}".format(my_keys.private_key).zfill(64)) # 0x000000000000004d79207374726f6e6765737420736563726574206576657221
 print(my_keys.public_key) # S256_P_(S256_FE_0xf8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b12, S256_FE_0x62668035ad55d1245a599e32937cb4661997dcb849ee76d82924bbcac512443a)
 
