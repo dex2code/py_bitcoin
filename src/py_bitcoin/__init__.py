@@ -1,7 +1,7 @@
+S256_PRIME = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
+
 S256_A = 0
 S256_B = 7
-
-S256_PRIME = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
 S256_N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
 
 S256_Gx = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798
