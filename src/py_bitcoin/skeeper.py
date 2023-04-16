@@ -27,21 +27,6 @@ class NewKeys:
 
         self.private_key = secret_
         self.public_key = secret_ * S256_G
-    
-
-    def __repr__(self) -> str:
-        my_repr = {
-            "private_key": {
-                "decimal": self.private_key,
-                "hexadecimal": "0x"+"{:x}".format(self.private_key).zfill(64)
-            },
-            "public_key": {
-                "decimal": self.public_key,
-                "hexadecimal": "0x"+"{:x}".format(self.public_key).zfill(64)
-            }
-        }
-
-        return json_dumps(obj=my_repr, indent=4)
 
 
 class Signature:

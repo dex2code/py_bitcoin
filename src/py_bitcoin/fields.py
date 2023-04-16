@@ -9,7 +9,7 @@ class FieldElement:
 
 
     def __repr__(self) -> str:
-        return f"FE_'{self.num}'_'{self.prime}'"
+        return f"FE_{self.num}_{self.prime}"
     
 
     def __eq__(self, __value) -> bool:
