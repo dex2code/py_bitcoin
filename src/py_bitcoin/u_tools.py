@@ -1,20 +1,22 @@
-from . import S256_N
-from hashlib import sha256
 import hmac
+from hashlib import sha256
+
 from requests import get as r_get
 
+from . import S256_N
 
-def get_hash256(__value: any) -> int:
+
+def get_hash256(message: any) -> int:
     """
     This function takes an arbitrary text or byte string as an argument
-    and returns a double hash of that argument as a byte string.
+    and returns a double hash SHA256 of that argument as a int number.
     """
-    if type(__value) == str:
-        input_text = __value.encode(encoding="utf-8")
-    elif type(__value) == bytes:
-        input_text = __value
+    if type(message) == str:
+        input_text = message.encode(encoding="utf-8")
+    elif type(message) == bytes:
+        input_text = message
     else:
-        raise TypeError("Input object should be <str> or <bytes>")
+        raise TypeError("(get_hash256) Input object should be <str> or <bytes>!")
     
     first_hash = sha256(input_text).digest()
     second_hash = sha256(first_hash).digest()
@@ -34,22 +36,21 @@ def get_random_secret() -> int:
         get_r = r_get(url=random_api, timeout=5)
         get_r.close()
     except Exception as E:
-        raise RuntimeError("Cannot get random K. Try later.")
+        raise RuntimeError("(get_random_secret) Cannot get random secret. Try later.")
     
     if get_r.status_code != 200:
-        raise RuntimeError("Cannot get random K. Try later.")
+        raise RuntimeError("(get_random_secret) Cannot get random secret. Try later.")
     
     random_secret = ''.join(get_r.text.split())
     if len(random_secret) != 2 * 32:
-        raise ValueError("Obtained random secret is defective. Try again.")
+        raise ValueError(f"(get_random_secret) Obtained random secret is defective ('{random_secret}'). Try again.")
     
     try:
         random_secret = int(random_secret, base=16)
-        random_secret = random_secret % S256_N
-        if random_secret == 0:
-            random_secret = random_secret + 1
+        if random_secret > S256_N:
+            random_secret = random_secret - S256_N
     except Exception as E:
-        raise ValueError("Obtained random secret is defective. Try again.")
+        raise ValueError(f"(get_random_secret) Obtained random secret is defective ('{random_secret}'). Try again.")
     
     return random_secret
 
@@ -77,8 +78,10 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
     while True:
         v = hmac.new(k, v, s256).digest()
         candidate_k = int.from_bytes(bytes=v, byteorder="big")
-        if candidate_k >= 1 and candidate_k < S256_N:
+
+        if (candidate_k >= 1) and (candidate_k < S256_N):
             return candidate_k
+        
         k = hmac.new(k, v + b'\x00', s256).digest()
         v = hmac.new(k, v, s256).digest()
 

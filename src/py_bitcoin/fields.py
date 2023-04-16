@@ -31,11 +31,13 @@ class FieldElement:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
         
         new_num = (self.num + __value.num) % self.prime
+
         return self.__class__(num=new_num, prime=self.prime)
 
 
     def __radd__(self, __value) -> object:
         new_num = (self.num + __value) % self.prime
+
         return self.__class__(num=new_num, prime=self.prime)
 
 
@@ -44,6 +46,7 @@ class FieldElement:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
         
         new_num = (self.num - __value.num) % self.prime
+
         return self.__class__(num=new_num, prime=self.prime)
     
 
@@ -52,11 +55,13 @@ class FieldElement:
             raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
 
         new_num = (self.num * __value.num) % self.prime
+
         return self.__class__(num=new_num, prime=self.prime)
 
 
     def __rmul__(self, __value) -> object:
         new_num = (self.num * __value) % self.prime
+
         return self.__class__(num=new_num, prime=self.prime)
 
 
@@ -68,12 +73,20 @@ class FieldElement:
             raise ZeroDivisionError
 
         new_num = (self.num * pow(base=__value.num, exp=self.prime-2, mod=self.prime)) % self.prime
+
         return self.__class__(num=new_num, prime=self.prime)     
     
 
     def __pow__(self, __value) -> object:
-        __value = __value % (self.prime - 1)
-        new_num = pow(base=self.num, exp=__value, mod=self.prime)
+        if type(__value) == int:
+            exp = __value % (self.prime - 1)
+        elif type(__value) == FieldElement:
+            if self.prime != __value.prime:
+                raise TypeError(f"self.prime '{self.prime}' is not equal to __value.prime '{__value.prime}'")
+            exp = __value.num
+
+        new_num = pow(base=self.num, exp=exp, mod=self.prime)
+        
         return self.__class__(num=new_num, prime=self.prime)
 
 
@@ -87,7 +100,7 @@ class S256_FieldElement(FieldElement):
 
 
     def __repr__(self):
-        return f"S256_FE_'{str(self.num).zfill(64)}'"
+        return "S256_FE_0x" +"{:x}".format(self.num).zfill(64)
 
 
 if __name__ == "__main__":

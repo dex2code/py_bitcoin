@@ -51,6 +51,7 @@ class Point:
 
         new_x = s**2 - self.x - __value.x
         new_y = s * (self.x - new_x) - self.y
+
         return self.__class__(x=new_x, y=new_y, a=self.a, b=self.b)
 
 
@@ -69,7 +70,7 @@ class Point:
         return result
 
 
-from . import S256_A, S256_B, S256_N
+from . import S256_A, S256_B, S256_N, S256_Gx, S256_Gy
 from .fields import S256_FieldElement
 
 
@@ -91,6 +92,7 @@ class S256_Point(Point):
 
     def __rmul__(self, __value) -> object:
         coeff = __value % S256_N
+        
         return super().__rmul__(coeff)
 
 

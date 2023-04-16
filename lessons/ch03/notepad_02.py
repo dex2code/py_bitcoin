@@ -1,28 +1,19 @@
-import os, sys, time
+import os, sys
 
 parent = os.path.abspath('.')
 sys.path.insert(1, parent)
 
 from src.py_bitcoin import S256_Gx, S256_Gy, S256_N
 from src.py_bitcoin.u_tools import get_hash256, get_random_secret, get_deterministic_k
+from src.py_bitcoin.fields import S256_FieldElement
 from src.py_bitcoin.curves import S256_Point
 from src.py_bitcoin.skeeper import NewKeys
 import json
 from src.py_bitcoin.skeeper import Secretary
 
+x = S256_FieldElement(num=0x887387e452b8eacc4acfde10d9aaf7f6d9a0f975aabb10d006e4da568744d06c)
+y = S256_FieldElement(num=0x61de6d95231cd89026e286df3b6ae4a894a3378e393e93a0f45b666329a0ae34)
 
-my_keys = NewKeys(secret=12345)
-print(f"Private key: {my_keys.private_key}")
-print(f"Public key: {my_keys.public_key}")
+p = S256_Point(x=x, y=y)
 
-my_message = "Programming Bitcoin!"
-my_message_hash = get_hash256(my_message)
-print(f"Message hash: {my_message_hash}")
-print(f"Message hash: {hex(my_message_hash)}")
-
-my_signature, p = Secretary.sign(private_key=my_keys.private_key, message_hash=my_message_hash)
-print(my_signature)
 print(p)
-
-bb = Secretary.verify(signature=my_signature, message_hash=my_message_hash)
-print(bb) 

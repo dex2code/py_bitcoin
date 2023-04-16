@@ -1,7 +1,9 @@
-from .u_tools import get_random_secret, get_hash256, get_deterministic_k
-from .curves import S256_Point
-from . import S256_N, S256_Gx, S256_Gy, S256_A, S256_B
 from json import dumps as json_dumps
+
+from . import S256_A, S256_B, S256_N, S256_Gx, S256_Gy
+from .curves import S256_Point
+from .u_tools import get_deterministic_k, get_hash256, get_random_secret
+
 
 class NewKeys:
 
@@ -15,12 +17,16 @@ class NewKeys:
         else:
             raise TypeError("Given secret must have type <int>, <str> or <bytes>")
 
-        mod_secret = secret_ % S256_N
-        if mod_secret == 0:
-            raise ValueError("Your secret is equal to S256_N number. Try another one.")
+        if secret_ > S256_N:
+            secret_ = secret_ % S256_N
         
-        self.private_key = mod_secret
-        self.public_key = (secret_ * S256_Point(x=S256_Gx, y=S256_Gy)).x.num
+        if secret_ == 0:
+            raise ValueError("Your secret calculated to zero number. Try another one.")
+        
+        S256_G = S256_Point(x=S256_Gx, y=S256_Gy)
+
+        self.private_key = secret_
+        self.public_key = secret_ * S256_G
     
 
     def __repr__(self) -> str:
@@ -40,21 +46,16 @@ class NewKeys:
 
 class Signature:
 
-    def __init__(self, rx, ry, s):
-        self.rx = rx
-        self.ry = ry
+    def __init__(self, r, s):
+        self.r = r
         self.s = s
 
 
     def __repr__(self) -> str:
         my_repr = {
-            "rx": {
-                "decimal": self.rx,
-                "hexadecimal": "0x"+"{:x}".format(self.rx).zfill(64)
-            },
-            "ry": {
-                "decimal": self.ry,
-                "hexadecimal": "0x"+"{:x}".format(self.ry).zfill(64)
+            "r": {
+                "decimal": self.r,
+                "hexadecimal": "0x"+"{:x}".format(self.r).zfill(64)
             },
             "s": {
                 "decimal": self.s,
@@ -77,25 +78,25 @@ class Secretary:
         S256_G = S256_Point(x=S256_Gx, y=S256_Gy)
 
         p = k * S256_G
-        rx = p.x.num
-        ry = p.y.num
-        s = (message_hash + rx * private_key) * k_inv % S256_N
+        r = p.x.num
+        s = (message_hash + r * private_key) * k_inv % S256_N
 
         if s > (S256_N / 2):
             s = S256_N - s
         
-        return Signature(rx=rx, ry=ry, s=s), p
+        return Signature(r=r, s=s)
 
 
-    def verify(signature: Signature, message_hash: int) -> bool:
-        S256_G = S256_Point(x=S256_Gx, y=S256_Gy)
+    def verify(signature: Signature, public_key: S256_Point, message_hash: int) -> bool:
         s_inv = pow(signature.s, S256_N - 2, S256_N)
         
         u = message_hash * s_inv % S256_N
-        v = signature.rx * s_inv % S256_N
-        
-        total = (u * S256_G) + (v * S256_Point(x=signature.rx, y=signature.ry))
+        v = signature.r * s_inv % S256_N
 
-        return total.x.num == signature.rx
+        S256_G = S256_Point(x=S256_Gx, y=S256_Gy)
+        
+        total = (u * S256_G) + (v * public_key)
+
+        return total.x.num == signature.r
 
         
