@@ -16,7 +16,7 @@ def get_hash256(message: any) -> int:
     elif type(message) == bytes:
         input_text = message
     else:
-        raise TypeError("(get_hash256) Input object should be <str> or <bytes>!")
+        raise TypeError("(u_tools.get_hash256) Input object should be <str> or <bytes>!")
     
     first_hash = sha256(input_text).digest()
     second_hash = sha256(first_hash).digest()
@@ -36,21 +36,21 @@ def get_random_secret() -> int:
         get_r = r_get(url=random_api, timeout=5)
         get_r.close()
     except Exception as E:
-        raise RuntimeError("(get_random_secret) Cannot get random secret. Try later.")
+        raise RuntimeError("(u_tools.get_random_secret) Cannot get random secret. Try later.")
     
     if get_r.status_code != 200:
-        raise RuntimeError("(get_random_secret) Cannot get random secret. Try later.")
+        raise RuntimeError("(u_tools.get_random_secret) Cannot get random secret. Try later.")
     
     random_secret = ''.join(get_r.text.split())
     if len(random_secret) != 2 * 32:
-        raise ValueError(f"(get_random_secret) Obtained random secret is defective ('{random_secret}'). Try again.")
+        raise ValueError(f"(u_tools.get_random_secret) Obtained random secret is defective ('{random_secret}'). Try again.")
     
     try:
         random_secret = int(random_secret, base=16)
         if random_secret > S256_N:
             random_secret = random_secret - S256_N
     except Exception as E:
-        raise ValueError(f"(get_random_secret) Obtained random secret is defective ('{random_secret}'). Try again.")
+        raise ValueError(f"(u_tools.get_random_secret) Obtained random secret is defective ('{random_secret}'). Try again.")
     
     return random_secret
 

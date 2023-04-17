@@ -1,3 +1,6 @@
+from json import dumps as json_dumps
+
+
 class Point:
 
     def __init__(self, x, y, a, b) -> None:
@@ -84,16 +87,31 @@ class S256_Point(Point):
 
 
     def __repr__(self) -> str:
-        if (self.x is None) and (self.y is None):
-            return f"S256_P_(I)"
+        my_repr = {
+            "x": {
+                "int": self.x.num,
+                "hex": "0x"+"{:x}".format(self.x.num).zfill(64)
+            },
+            "y": {
+                "int": self.y.num,
+                "hex": "0x"+"{:x}".format(self.y.num).zfill(64)
+            }
+        }
 
-        return f"S256_P_({self.x}, {self.y})"
+        return json_dumps(obj=my_repr, indent=4)
 
 
     def __rmul__(self, __value) -> object:
         coeff = __value % S256_N
         
         return super().__rmul__(coeff)
+    
+
+    def sec_value(self, compressed=True):
+        if compressed:
+            pass
+        else:
+            return b'\x04' + self.x.num.to_bytes(32, "big") + self.y.num.to_bytes(32, "big")
 
 
 if __name__ == "__main__":

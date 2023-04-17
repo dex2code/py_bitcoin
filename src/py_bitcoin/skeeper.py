@@ -1,11 +1,49 @@
 from json import dumps as json_dumps
 
-from . import S256_A, S256_B, S256_N, S256_Gx, S256_Gy
+from . import S256_N, S256_Gx, S256_Gy
 from .curves import S256_Point
 from .u_tools import get_deterministic_k, get_hash256, get_random_secret
 
 
-class NewKeys:
+class PrivateKey:
+
+    def __init__(self, private_key: int) -> None:
+        self.int_value = private_key
+        self.hex_value = "0x" +"{:x}".format(self.int_value).zfill(64)
+    
+
+    def __repr__(self) -> str:
+        my_repr = {
+            "int": self.int_value,
+            "hex": self.hex_value
+        }
+
+        return json_dumps(obj=my_repr, indent=4)
+
+
+class Signature:
+
+    def __init__(self, r, s):
+        self.r = r
+        self.s = s
+
+
+    def __repr__(self) -> str:
+        my_repr = {
+            "r": {
+                "int": self.r,
+                "hex": "0x"+"{:x}".format(self.r).zfill(64)
+            },
+            "s": {
+                "int": self.s,
+                "hex": "0x"+"{:x}".format(self.s).zfill(64)
+            }
+        }
+
+        return json_dumps(obj=my_repr, indent=4)
+
+
+class GenerateKeys:
 
     def __init__(self, secret=get_random_secret()):
         if type(secret) == int:
@@ -25,46 +63,24 @@ class NewKeys:
         
         S256_G = S256_Point(x=S256_Gx, y=S256_Gy)
 
-        self.private_key = secret_
+        self.private_key = PrivateKey(private_key=secret_)
         self.public_key = secret_ * S256_G
-
-
-class Signature:
-
-    def __init__(self, r, s):
-        self.r = r
-        self.s = s
-
-
-    def __repr__(self) -> str:
-        my_repr = {
-            "r": {
-                "decimal": self.r,
-                "hexadecimal": "0x"+"{:x}".format(self.r).zfill(64)
-            },
-            "s": {
-                "decimal": self.s,
-                "hexadecimal": "0x"+"{:x}".format(self.s).zfill(64)
-            }
-        }
-
-        return json_dumps(obj=my_repr, indent=4)
 
 
 class Secretary:
 
-    def sign(private_key: int, message_hash: int) -> Signature:
-        if type(private_key) != int or type(message_hash) != int:
-            raise TypeError("Both attributes must be <int>")
+    def sign(private_key: PrivateKey, message_hash: int) -> Signature:
+        if type(private_key) != PrivateKey or type(message_hash) != int:
+            raise TypeError("(Secretary.sign) Wrong attributes type!")
 
-        k = get_deterministic_k(private_key=private_key, message_hash=message_hash)
+        k = get_deterministic_k(private_key=private_key.int_value, message_hash=message_hash)
         k_inv = pow(k, S256_N - 2, S256_N)
 
         S256_G = S256_Point(x=S256_Gx, y=S256_Gy)
 
         p = k * S256_G
         r = p.x.num
-        s = (message_hash + r * private_key) * k_inv % S256_N
+        s = (message_hash + r * private_key.int_value) * k_inv % S256_N
 
         if s > (S256_N / 2):
             s = S256_N - s
