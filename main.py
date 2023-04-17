@@ -81,7 +81,7 @@ print(point) # S256_P_(S256_FE_0x887387e452b8eacc4acfde10d9aaf7f6d9a0f975aabb10d
 
 
 # ECDSA
-from src.py_bitcoin.skeeper import NewKeys, Signature, Secretary
+from src.py_bitcoin.skeeper import NewKeys, Secretary
 from src.py_bitcoin.u_tools import get_hash256
 
 my_keys = NewKeys() # Generate _random_ secret and public keys
@@ -126,4 +126,3 @@ print(my_signature)
 
 print(Secretary.verify(signature=my_signature, public_key=my_keys.public_key, message_hash=my_message_hash)) # True
 print(Secretary.verify(signature=my_signature, public_key=my_keys.public_key, message_hash=my_message_hash + 1)) # False
-
