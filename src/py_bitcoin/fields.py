@@ -101,6 +101,9 @@ class S256_FieldElement(FieldElement):
 
     def __repr__(self):
         return "S256_FE_0x" +"{:x}".format(self.num).zfill(64)
+    
+    def get_sqrt(self) -> FieldElement:
+        return self**((S256_PRIME + 1) // 4)
 
 
 if __name__ == "__main__":

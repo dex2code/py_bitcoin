@@ -41,7 +41,29 @@ class Signature:
         }
 
         return json_dumps(obj=my_repr, indent=4)
+    
 
+    def der_value(self) -> bytes:
+        """
+        Returns DER format of Signature object
+        """
+        r_bin = self.r.to_bytes(length=32, byteorder="big").lstrip(b'\x00')
+        
+        if r_bin[0] & 0x80:
+            r_bin = b'\x00' + r_bin
+        
+        result = bytes([2, len(r_bin)]) + r_bin
+
+        s_bin = self.s.to_bytes(length=32, byteorder="big").lstrip(b'\x00')
+
+        if s_bin[0] & 0x80:
+            s_bin = b'\x00' + s_bin
+
+        result = result + bytes([2, len(s_bin)]) + s_bin
+        
+        result = bytes([0x30, len(result)]) + result
+
+        return result
 
 class GenerateKeys:
 

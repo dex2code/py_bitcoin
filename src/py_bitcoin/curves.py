@@ -107,9 +107,13 @@ class S256_Point(Point):
         return super().__rmul__(coeff)
     
 
-    def sec_value(self, compressed=True):
+    def sec_value(self, compressed=True) -> bytes:
+        """Returns public key in SEC format"""
         if compressed:
-            pass
+            if self.y.num % 2 == 0:
+                return b'\x02' + self.x.num.to_bytes(32, "big")
+            else:
+                return b'\x03' + self.x.num.to_bytes(32, "big")
         else:
             return b'\x04' + self.x.num.to_bytes(32, "big") + self.y.num.to_bytes(32, "big")
 

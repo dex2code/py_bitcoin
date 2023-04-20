@@ -1,3 +1,6 @@
+"""
+Finite Fields
+"""
 from src.py_bitcoin.fields import FieldElement
 
 prime = 17
@@ -22,6 +25,9 @@ print(fe_1**9) # FE_10_17
 print(fe_1**fe_2) # FE_10_17
 
 
+"""
+Elliptic Curves
+"""
 from src.py_bitcoin.curves import Point
 
 # y^2 = x^3 + ax + b
@@ -92,6 +98,9 @@ print(point)
 """
 
 
+"""
+Elliptic Curve Cryptography
+"""
 # ECDSA
 from src.py_bitcoin.skeeper import GenerateKeys, Secretary
 from src.py_bitcoin.u_tools import get_hash256
@@ -117,6 +126,8 @@ print(my_keys.public_key)
     }
 }
 """
+print(my_keys.public_key.sec_value(compressed=False).hex()) # 04e68d04cbee99c26f93ace023b285ed1844ed63c8581a19879dfb25c9728c13d90864e086883af0e8fce9136c533641306ac6b172e13ce921a0b29fc67b745262
+print(my_keys.public_key.sec_value(compressed=True).hex()) # 02e68d04cbee99c26f93ace023b285ed1844ed63c8581a19879dfb25c9728c13d9
 
 my_keys = GenerateKeys(secret="My strongest secret ever!") # Or you can generate predefined keys
 print(my_keys.private_key)
@@ -139,6 +150,9 @@ print(my_keys.public_key)
     }
 }
 """
+print(my_keys.public_key.sec_value(compressed=False).hex()) # 04f8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b1262668035ad55d1245a599e32937cb4661997dcb849ee76d82924bbcac512443a
+print(my_keys.public_key.sec_value(compressed=True).hex()) # 02f8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b12
+
 
 my_message = """
 Commerce on the Internet has come to rely almost exclusively on financial institutions serving as
@@ -170,6 +184,10 @@ print(my_signature)
         "hex": "0x7bc1254af206c640f82a5a2f8f0f21d8155ec2d5243779ae50c2cd653c3dbd95"
     }
 }
+"""
+print(my_signature.der_value().hex())
+"""
+3045022100f63e0bda6bdb172a76a6493d892f19c579963760b1d584b0dfbaa7733913a3ab02207bc1254af206c640f82a5a2f8f0f21d8155ec2d5243779ae50c2cd653c3dbd95
 """
 
 print(Secretary.verify(signature=my_signature, public_key=my_keys.public_key, message_hash=my_message_hash)) # True
