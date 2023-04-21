@@ -1,6 +1,7 @@
-from json import dumps as json_dumps
-from .u_tools import get_hash256, get_base58
 import hashlib
+from json import dumps as json_dumps
+
+import base58
 
 
 class Point:
@@ -133,7 +134,7 @@ class S256_Point(Point):
 
         result = prefix + h160
 
-        return get_base58(result + get_hash256(result, to_int=False)[:4])
+        return base58.b58encode_check(v=result)
 
 if __name__ == "__main__":
     pass

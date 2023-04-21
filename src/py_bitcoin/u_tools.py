@@ -1,10 +1,12 @@
 import hmac
 from hashlib import sha256
-
-from requests import get as r_get
 from typing import Union
 
-from . import S256_N, BITCOIN_ALPHABET
+from requests import get as r_get
+
+from . import S256_N
+
+import base58
 
 
 def get_hash256(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
@@ -88,28 +90,21 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
         
         k = hmac.new(k, v + b'\x00', s256).digest()
         v = hmac.new(k, v, s256).digest()
+
+
+def wif_to_int(wif_key: str, compressed: bool = True, testnet: bool = False) -> int:
+    wif_bytes = base58.b58decode_check(v=wif_key)
+
+    if testnet and wif_bytes[0:1] != b'\xef':
+        raise ValueError(f"(u_tools.wif_to_int) First byte ({wif_bytes[0:1]}) is not '0xef' for {testnet=}")
     
-
-def get_base58(input_data: bytes) -> bytes:
-    """
-    Returns BASE58-encoded bytes
-    """
-    if type(input_data) != bytes:
-        raise TypeError("(u_tools.get_base58) Input data must be byte-encoded.")     
-
-    result = b""
-
-    orig_len = len(input_data)
-    input_data = input_data.lstrip(b'\x00')
-    new_len = len(input_data)
-
-    acc = int.from_bytes(bytes=input_data, byteorder="big")
-
-    while acc:
-        acc, idx = divmod(acc, len(BITCOIN_ALPHABET))
-        result = BITCOIN_ALPHABET[idx:idx+1] + result
+    if not testnet and wif_bytes[0:1] != b'\x80':
+        raise ValueError(f"(u_tools.wif_to_int) First byte ({wif_bytes[0:1]}) is not '0x80' for {testnet=}")
     
-    return BITCOIN_ALPHABET[0:1] * (orig_len - new_len) + result
+    if compressed and wif_bytes[-1:] != b'\x01':
+        raise ValueError(f"(u_tools.wif_to_int) Last byte ({wif_bytes[-1:]}) is not '0x01' for {compressed=}")
+    
+    return int.from_bytes(bytes=wif_bytes[1:-1], byteorder="big")
 
 
 if __name__ == "__main__":

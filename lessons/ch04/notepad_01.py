@@ -12,5 +12,9 @@ import json
 from src.py_bitcoin.skeeper import Secretary
 
 
-my_wallet = Wallet(secret=0x12345deadbeef)
-print(my_wallet.address(compressed=True, testnet=False))
+my_wallet = Wallet(secret="KxU4tne85nJo7oDRNcATqvdyiDUY8gfRNiTQPQyyey3RkQu3mZxp")
+wif_key = my_wallet.private_key.wif_value()
+btc_address = my_wallet.address()
+print(f"{wif_key=}")
+print(f"{btc_address=}")
+print()

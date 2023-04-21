@@ -1,8 +1,11 @@
 from json import dumps as json_dumps
 
+import base58
+
 from . import S256_N, S256_Gx, S256_Gy
 from .curves import S256_Point
-from .u_tools import get_deterministic_k, get_hash256, get_base58, get_random_secret
+from .u_tools import get_deterministic_k, get_random_secret, wif_to_int
+from typing import Union
 
 
 class PrivateKey:
@@ -10,6 +13,7 @@ class PrivateKey:
     def __init__(self, private_key: int) -> None:
         self.int_value = private_key
         self.hex_value = "0x" +"{:x}".format(self.int_value).zfill(64)
+        self.bytes_value = private_key.to_bytes(length=32, byteorder="big")
     
 
     def __repr__(self) -> str:
@@ -36,7 +40,7 @@ class PrivateKey:
         
         result = prefix + secret_bytes + suffix
 
-        return get_base58(result + get_hash256(message=result, to_int=False)[:4]).decode()
+        return base58.b58encode_check(v=result).decode()
 
 
 class Signature:
@@ -85,13 +89,16 @@ class Signature:
 
 class Wallet:
 
-    def __init__(self, secret=get_random_secret()):
+    def __init__(self, secret: Union[int, bytes, str] = get_random_secret(), wif: bool = True, wif_compressed: bool = True, wif_testnet: bool = False):
         if type(secret) == int:
             secret_ = secret
         elif type(secret) == bytes:
             secret_ = int.from_bytes(bytes=secret, byteorder="big")
         elif type(secret) == str:
-            secret_ = int.from_bytes(bytes=secret.encode(encoding="utf-8"), byteorder="big")
+            if wif:
+                secret_ = wif_to_int(wif_key=secret, compressed=wif_compressed, testnet=wif_testnet)
+            else:
+                secret_ = int.from_bytes(bytes=secret.encode(encoding="utf-8"), byteorder="big")
         else:
             raise TypeError("Given secret must have type <int>, <str> or <bytes>")
 
