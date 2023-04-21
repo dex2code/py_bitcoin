@@ -113,6 +113,9 @@ print(my_wallet.private_key)
     "hex": "0xfff7bd4e0cd4f86d41fb642816a3c159689a2a8db3f5f06ef24b886ea077b678"
 }
 """
+print(my_wallet.private_key.wif_value(compressed=True, testnet=False)) # L4mWuYgF9vQc4jVqPPmGQ1ViQZuEDE514Q3VzDrnHQQTDFv1ABWy
+print(my_wallet.private_key.wif_value(compressed=True, testnet=True))
+
 print(my_wallet.public_key)
 """
 {

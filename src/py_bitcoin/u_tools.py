@@ -1,13 +1,13 @@
 import hmac
 from hashlib import sha256
-from re import match
 
 from requests import get as r_get
+from typing import Union
 
-from . import S256_N
+from . import S256_N, BITCOIN_ALPHABET
 
 
-def get_hash256(message: any, to_int=True):
+def get_hash256(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
     """
     This function takes an arbitrary text or byte string as an argument
     and returns a double hash SHA256 of that argument as a int number.
@@ -88,6 +88,28 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
         
         k = hmac.new(k, v + b'\x00', s256).digest()
         v = hmac.new(k, v, s256).digest()
+    
+
+def get_base58(input_data: bytes) -> bytes:
+    """
+    Returns BASE58-encoded bytes
+    """
+    if type(input_data) != bytes:
+        raise TypeError("(u_tools.get_base58) Input data must be byte-encoded.")     
+
+    result = b""
+
+    orig_len = len(input_data)
+    input_data = input_data.lstrip(b'\x00')
+    new_len = len(input_data)
+
+    acc = int.from_bytes(bytes=input_data, byteorder="big")
+
+    while acc:
+        acc, idx = divmod(acc, len(BITCOIN_ALPHABET))
+        result = BITCOIN_ALPHABET[idx:idx+1] + result
+    
+    return BITCOIN_ALPHABET[0:1] * (orig_len - new_len) + result
 
 
 if __name__ == "__main__":

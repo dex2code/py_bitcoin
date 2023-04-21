@@ -2,7 +2,7 @@ from json import dumps as json_dumps
 
 from . import S256_N, S256_Gx, S256_Gy
 from .curves import S256_Point
-from .u_tools import get_deterministic_k, get_hash256, get_random_secret
+from .u_tools import get_deterministic_k, get_hash256, get_base58, get_random_secret
 
 
 class PrivateKey:
@@ -19,6 +19,24 @@ class PrivateKey:
         }
 
         return json_dumps(obj=my_repr, indent=4)
+    
+
+    def wif_value(self, compressed: bool = True, testnet: bool = False) -> str:
+        secret_bytes = self.int_value.to_bytes(length=32, byteorder="big")
+
+        if testnet:
+            prefix = b'\xef'
+        else:
+            prefix = b'\x80'
+        
+        if compressed:
+            suffix = b'\x01'
+        else:
+            suffix = b''
+        
+        result = prefix + secret_bytes + suffix
+
+        return get_base58(result + get_hash256(message=result, to_int=False)[:4]).decode()
 
 
 class Signature:
@@ -89,7 +107,7 @@ class Wallet:
         self.public_key = secret_ * S256_G
         
     
-    def address(self, compressed=True, testnet=False):
+    def address(self, compressed: bool = True, testnet: bool = False) -> str:
         return self.public_key.address_value(compressed=compressed, testnet=testnet).decode()
 
 
