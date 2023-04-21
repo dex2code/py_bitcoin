@@ -65,7 +65,7 @@ class Signature:
 
         return result
 
-class GenerateKeys:
+class Wallet:
 
     def __init__(self, secret=get_random_secret()):
         if type(secret) == int:
@@ -87,6 +87,10 @@ class GenerateKeys:
 
         self.private_key = PrivateKey(private_key=secret_)
         self.public_key = secret_ * S256_G
+        
+    
+    def address(self, compressed=True, testnet=False):
+        return self.public_key.address_value(compressed=compressed, testnet=testnet).decode()
 
 
 class Secretary:

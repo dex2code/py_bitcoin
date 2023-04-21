@@ -1,12 +1,13 @@
 import hmac
 from hashlib import sha256
+from re import match
 
 from requests import get as r_get
 
 from . import S256_N
 
 
-def get_hash256(message: any) -> int:
+def get_hash256(message: any, to_int=True):
     """
     This function takes an arbitrary text or byte string as an argument
     and returns a double hash SHA256 of that argument as a int number.
@@ -20,9 +21,12 @@ def get_hash256(message: any) -> int:
     
     first_hash = sha256(input_text).digest()
     second_hash = sha256(first_hash).digest()
-    final_hash = int.from_bytes(bytes=second_hash, byteorder="big")
 
-    return final_hash
+    if to_int:
+        final_hash = int.from_bytes(bytes=second_hash, byteorder="big")
+        return final_hash
+    else:
+        return second_hash
 
 
 def get_random_secret() -> int:

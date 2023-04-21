@@ -102,18 +102,18 @@ print(point)
 Elliptic Curve Cryptography
 """
 # ECDSA
-from src.py_bitcoin.skeeper import GenerateKeys, Secretary
+from src.py_bitcoin.skeeper import Wallet, Secretary
 from src.py_bitcoin.u_tools import get_hash256
 
-my_keys = GenerateKeys() # Generate _random_ secret and public keys
-print(my_keys.private_key)
+my_wallet = Wallet() # Generate _random_ secret and public keys
+print(my_wallet.private_key)
 """
 {
     "int": 115777494148019931866928113890741224965578616471279673064180114706432139966072,
     "hex": "0xfff7bd4e0cd4f86d41fb642816a3c159689a2a8db3f5f06ef24b886ea077b678"
 }
 """
-print(my_keys.public_key)
+print(my_wallet.public_key)
 """
 {
     "x": {
@@ -126,18 +126,20 @@ print(my_keys.public_key)
     }
 }
 """
-print(my_keys.public_key.sec_value(compressed=False).hex()) # 04e68d04cbee99c26f93ace023b285ed1844ed63c8581a19879dfb25c9728c13d90864e086883af0e8fce9136c533641306ac6b172e13ce921a0b29fc67b745262
-print(my_keys.public_key.sec_value(compressed=True).hex()) # 02e68d04cbee99c26f93ace023b285ed1844ed63c8581a19879dfb25c9728c13d9
+print(my_wallet.public_key.sec_value(compressed=False).hex()) # 04e68d04cbee99c26f93ace023b285ed1844ed63c8581a19879dfb25c9728c13d90864e086883af0e8fce9136c533641306ac6b172e13ce921a0b29fc67b745262
+print(my_wallet.public_key.sec_value(compressed=True).hex()) # 02e68d04cbee99c26f93ace023b285ed1844ed63c8581a19879dfb25c9728c13d9
+print(my_wallet.address(testnet=True)) # mj4phvNSRUB5cNoe35Dq64ozswt975u2KR
+print(my_wallet.address(testnet=False)) # 165FxuZx78gnBduuQQsrYxQ3aEeYHCeiD8
 
-my_keys = GenerateKeys(secret="My strongest secret ever!") # Or you can generate predefined keys
-print(my_keys.private_key)
+my_wallet = Wallet(secret="My strongest secret ever!") # Or you can generate predefined keys
+print(my_wallet.private_key)
 """
 {
     "int": 486306853179768214323147254942175147312001728581351145566753,
     "hex": "0x000000000000004d79207374726f6e6765737420736563726574206576657221"
 }
 """
-print(my_keys.public_key)
+print(my_wallet.public_key)
 """
 {
     "x": {
@@ -150,9 +152,10 @@ print(my_keys.public_key)
     }
 }
 """
-print(my_keys.public_key.sec_value(compressed=False).hex()) # 04f8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b1262668035ad55d1245a599e32937cb4661997dcb849ee76d82924bbcac512443a
-print(my_keys.public_key.sec_value(compressed=True).hex()) # 02f8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b12
-
+print(my_wallet.public_key.sec_value(compressed=False).hex()) # 04f8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b1262668035ad55d1245a599e32937cb4661997dcb849ee76d82924bbcac512443a
+print(my_wallet.public_key.sec_value(compressed=True).hex()) # 02f8bb54eea41bd705fdbde54d6f35d77f255783515887b252533a4db47d372b12
+print(my_wallet.address(testnet=True)) # mjuS52MD5AH6VRzPHQFrmpvDrWAQxgyWrv
+print(my_wallet.address(testnet=False)) # 15PUmyGEG8qqiKWmZqHUwuhtzWZi7P75ZJ
 
 my_message = """
 Commerce on the Internet has come to rely almost exclusively on financial institutions serving as
@@ -171,7 +174,7 @@ over a communications channel without a trusted party."""
 my_message_hash = get_hash256(message=my_message)
 print("0x"+"{:x}".format(my_message_hash)) # 0xf6b01c555c5d747f85f4c5fddb1335c1ad6f26c3d6ce718ca6beb378ad3f2a53
 
-my_signature = Secretary.sign(private_key=my_keys.private_key, message_hash=my_message_hash)
+my_signature = Secretary.sign(private_key=my_wallet.private_key, message_hash=my_message_hash)
 print(my_signature)
 """
 {
@@ -190,5 +193,5 @@ print(my_signature.der_value().hex())
 3045022100f63e0bda6bdb172a76a6493d892f19c579963760b1d584b0dfbaa7733913a3ab02207bc1254af206c640f82a5a2f8f0f21d8155ec2d5243779ae50c2cd653c3dbd95
 """
 
-print(Secretary.verify(signature=my_signature, public_key=my_keys.public_key, message_hash=my_message_hash)) # True
-print(Secretary.verify(signature=my_signature, public_key=my_keys.public_key, message_hash=my_message_hash + 1)) # False
+print(Secretary.verify(signature=my_signature, public_key=my_wallet.public_key, message_hash=my_message_hash)) # True
+print(Secretary.verify(signature=my_signature, public_key=my_wallet.public_key, message_hash=my_message_hash + 1)) # False

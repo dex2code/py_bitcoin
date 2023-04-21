@@ -1,4 +1,6 @@
 from json import dumps as json_dumps
+from .u_tools import get_hash256
+import hashlib, base58
 
 
 class Point:
@@ -117,6 +119,21 @@ class S256_Point(Point):
         else:
             return b'\x04' + self.x.num.to_bytes(32, "big") + self.y.num.to_bytes(32, "big")
 
+
+    def address_value(self, compressed=True, testnet=False):
+        h160 = hashlib.new(
+            name="ripemd160",
+            data=hashlib.sha256(string=self.sec_value(compressed=compressed)).digest()
+        ).digest()
+
+        if testnet:
+            prefix = b'\x6f'
+        else:
+            prefix = b'\x00'
+
+        result = prefix + h160
+
+        return base58.b58encode(result + get_hash256(result, to_int=False)[:4])
 
 if __name__ == "__main__":
     pass
