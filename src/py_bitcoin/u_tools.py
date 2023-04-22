@@ -9,6 +9,34 @@ from . import S256_N
 import base58
 
 
+def be_to_int(input_bytes: bytes) -> int:
+    if type(input_bytes) != bytes:
+        raise TypeError("(u_tools.be_to_int) Input data is not bytes.")
+    
+    return int.from_bytes(bytes=input_bytes, byteorder="big")
+
+
+def le_to_int(input_bytes: bytes) -> int:
+    if type(input_bytes) != bytes:
+        raise TypeError("(u_tools.le_to_int) Input data is not bytes.")
+    
+    return int.from_bytes(bytes=input_bytes, byteorder="little")
+
+
+def int_to_be(input_int: int, output_length: int = 32) -> bytes:
+    if type(input_int) != int or type(output_length) != int:
+        raise TypeError("(u_tools.int_to_be) Input data is not int.")
+
+    return input_int.to_bytes(length=output_length, byteorder="big")
+
+
+def int_to_le(input_int: int, output_length: int = 32) -> bytes:
+    if type(input_int) != int or type(output_length) != int:
+        raise TypeError("(u_tools.int_to_le) Input data is not int.")
+
+    return input_int.to_bytes(length=output_length, byteorder="little")
+
+
 def get_hash256(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
     """
     This function takes an arbitrary text or byte string as an argument
@@ -25,7 +53,7 @@ def get_hash256(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
     second_hash = sha256(first_hash).digest()
 
     if to_int:
-        final_hash = int.from_bytes(bytes=second_hash, byteorder="big")
+        final_hash = be_to_int(input_bytes=second_hash)
         return final_hash
     else:
         return second_hash
@@ -71,8 +99,8 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
     if message_hash > S256_N:
         message_hash = message_hash - S256_N
 
-    message_hash_bytes = message_hash.to_bytes(length=32, byteorder="big")
-    private_key_bytes = private_key.to_bytes(length=32, byteorder="big")
+    message_hash_bytes = int_to_be(input_int=message_hash)
+    private_key_bytes = int_to_be(input_int=private_key)
 
     s256 = sha256
 
@@ -83,7 +111,7 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
     
     while True:
         v = hmac.new(k, v, s256).digest()
-        candidate_k = int.from_bytes(bytes=v, byteorder="big")
+        candidate_k = be_to_int(input_bytes=v)
 
         if (candidate_k >= 1) and (candidate_k < S256_N):
             return candidate_k
@@ -104,7 +132,7 @@ def wif_to_int(wif_key: str, compressed: bool = True, testnet: bool = False) -> 
     if compressed and wif_bytes[-1:] != b'\x01':
         raise ValueError(f"(u_tools.wif_to_int) Last byte ({wif_bytes[-1:]}) is not '0x01' for {compressed=}")
     
-    return int.from_bytes(bytes=wif_bytes[1:-1], byteorder="big")
+    return be_to_int(input_bytes=wif_bytes[1:-1])
 
 
 if __name__ == "__main__":

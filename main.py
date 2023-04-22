@@ -134,7 +134,7 @@ print(my_wallet.public_key.sec_value(compressed=True).hex()) # 02e68d04cbee99c26
 print(my_wallet.address(testnet=True)) # mj4phvNSRUB5cNoe35Dq64ozswt975u2KR
 print(my_wallet.address(testnet=False)) # 165FxuZx78gnBduuQQsrYxQ3aEeYHCeiD8
 
-my_wallet = Wallet(secret="My strongest secret ever!") # Or you can generate predefined keys
+my_wallet = Wallet(secret="My strongest secret ever!", wif=False) # Or you can generate predefined keys
 print(my_wallet.private_key)
 """
 {

@@ -1,5 +1,6 @@
 import hashlib
 from json import dumps as json_dumps
+from .u_tools import *
 
 import base58
 
@@ -76,7 +77,7 @@ class Point:
         return result
 
 
-from . import S256_A, S256_B, S256_N, S256_Gx, S256_Gy
+from . import S256_A, S256_B, S256_N, S256_PRIME
 from .fields import S256_FieldElement
 
 
@@ -114,11 +115,11 @@ class S256_Point(Point):
         """Returns public key in SEC format"""
         if compressed:
             if self.y.num % 2 == 0:
-                return b'\x02' + self.x.num.to_bytes(32, "big")
+                return b'\x02' + int_to_be(input_int=self.x.num)
             else:
-                return b'\x03' + self.x.num.to_bytes(32, "big")
+                return b'\x03' + int_to_be(input_int=self.x.num)
         else:
-            return b'\x04' + self.x.num.to_bytes(32, "big") + self.y.num.to_bytes(32, "big")
+            return b'\x04' + int_to_be(input_int=self.x.num) + int_to_be(input_int=self.y.num)
 
 
     def address_value(self, compressed: bool = True, testnet: bool = False) -> bytes:
@@ -135,6 +136,35 @@ class S256_Point(Point):
         result = prefix + h160
 
         return base58.b58encode_check(v=result)
+    
+
+    @classmethod
+    def restore_from_sec(self, sec_bytes: bytes):
+        if sec_bytes[0] == 4:
+            x = be_to_int(input_bytes=sec_bytes[1:33])
+            y = be_to_int(input_bytes=sec_bytes[33:65])
+            return S256_Point(x=x, y=y)
+        
+        is_even = sec_bytes[0] == 2
+
+        num = be_to_int(input_bytes=sec_bytes[1:])
+        x = S256_FieldElement(num=num)
+
+        alpha = x**3 + S256_FieldElement(num=S256_B)
+        beta = alpha.get_sqrt()
+
+        if beta.num % 2 == 0:
+            even_beta = beta
+            odd_beta = S256_FieldElement(num=(S256_PRIME - beta.num))
+        else:
+            even_beta = S256_FieldElement(num=(S256_PRIME - beta.num))
+            odd_beta = beta
+        
+        if is_even:
+            return S256_Point(x=x, y=even_beta)
+        else:
+            return S256_Point(x=x, y=odd_beta)
+
 
 if __name__ == "__main__":
     pass

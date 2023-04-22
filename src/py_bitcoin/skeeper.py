@@ -1,11 +1,11 @@
 from json import dumps as json_dumps
+from typing import Union
 
 import base58
 
 from . import S256_N, S256_Gx, S256_Gy
 from .curves import S256_Point
-from .u_tools import get_deterministic_k, get_random_secret, wif_to_int
-from typing import Union
+from .u_tools import *
 
 
 class PrivateKey:
@@ -13,7 +13,7 @@ class PrivateKey:
     def __init__(self, private_key: int) -> None:
         self.int_value = private_key
         self.hex_value = "0x" +"{:x}".format(self.int_value).zfill(64)
-        self.bytes_value = private_key.to_bytes(length=32, byteorder="big")
+        self.bytes_value = int_to_be(input_int=private_key, output_length=32)
     
 
     def __repr__(self) -> str:
@@ -26,7 +26,7 @@ class PrivateKey:
     
 
     def wif_value(self, compressed: bool = True, testnet: bool = False) -> str:
-        secret_bytes = self.int_value.to_bytes(length=32, byteorder="big")
+        secret_bytes = int_to_be(input_int=self.int_value, output_length=32)
 
         if testnet:
             prefix = b'\xef'
@@ -69,14 +69,14 @@ class Signature:
         """
         Returns DER format of Signature object
         """
-        r_bin = self.r.to_bytes(length=32, byteorder="big").lstrip(b'\x00')
+        r_bin = int_to_be(input_int=self.r, output_length=32).lstrip(b'\x00')
         
         if r_bin[0] & 0x80:
             r_bin = b'\x00' + r_bin
         
         result = bytes([2, len(r_bin)]) + r_bin
 
-        s_bin = self.s.to_bytes(length=32, byteorder="big").lstrip(b'\x00')
+        s_bin = int_to_be(input_int=self.s, output_length=32).lstrip(b'\x00')
 
         if s_bin[0] & 0x80:
             s_bin = b'\x00' + s_bin
@@ -87,18 +87,20 @@ class Signature:
 
         return result
 
+
 class Wallet:
 
     def __init__(self, secret: Union[int, bytes, str] = get_random_secret(), wif: bool = True, wif_compressed: bool = True, wif_testnet: bool = False):
         if type(secret) == int:
             secret_ = secret
         elif type(secret) == bytes:
-            secret_ = int.from_bytes(bytes=secret, byteorder="big")
+            secret_ = be_to_int(input_bytes=secret)
         elif type(secret) == str:
             if wif:
                 secret_ = wif_to_int(wif_key=secret, compressed=wif_compressed, testnet=wif_testnet)
             else:
-                secret_ = int.from_bytes(bytes=secret.encode(encoding="utf-8"), byteorder="big")
+                secret_ = secret.encode(encoding="utf-8")
+                secret_ = be_to_int(input_bytes=secret_)
         else:
             raise TypeError("Given secret must have type <int>, <str> or <bytes>")
 
@@ -150,5 +152,3 @@ class Secretary:
         total = (u * S256_G) + (v * public_key)
 
         return total.x.num == signature.r
-
-        
