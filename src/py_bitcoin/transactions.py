@@ -1,9 +1,11 @@
-from . import *
-from .u_tools import *
-from typing import BinaryIO
-from .script import Script
-from requests import get as r_get
 from io import BytesIO
+from typing import BinaryIO
+
+from requests import get as r_get
+
+from . import *
+from .script import Script
+from .u_tools import *
 
 
 class Tx:
@@ -100,10 +102,6 @@ class Tx:
             raise ValueError(f"Cannot parse TX obtained from explorer.")
         
         return cls(tx.tx_version, tx.tx_ins, tx.tx_outs, tx.tx_locktime, tx.testnet)
-
-
-
-
 
 
 class TxIn:
