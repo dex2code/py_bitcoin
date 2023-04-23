@@ -1,3 +1,6 @@
+from . import *
+
+
 class FieldElement:
 
     def __init__(self, num, prime) -> None:
@@ -88,9 +91,6 @@ class FieldElement:
         new_num = pow(base=self.num, exp=exp, mod=self.prime)
         
         return self.__class__(num=new_num, prime=self.prime)
-
-
-from . import S256_PRIME
 
 
 class S256_FieldElement(FieldElement):

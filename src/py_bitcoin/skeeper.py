@@ -3,7 +3,7 @@ from typing import Union
 
 import base58
 
-from . import S256_N, S256_Gx, S256_Gy
+from . import *
 from .curves import S256_Point
 from .u_tools import *
 

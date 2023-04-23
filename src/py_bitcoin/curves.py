@@ -1,8 +1,10 @@
-import hashlib
 from json import dumps as json_dumps
-from .u_tools import *
 
 import base58
+
+from . import *
+from .fields import S256_FieldElement
+from .u_tools import *
 
 
 class Point:
@@ -77,10 +79,6 @@ class Point:
         return result
 
 
-from . import S256_A, S256_B, S256_N, S256_PRIME
-from .fields import S256_FieldElement
-
-
 class S256_Point(Point):
 
     def __init__(self, x, y, a=None, b=None) -> None:
@@ -123,10 +121,7 @@ class S256_Point(Point):
 
 
     def address_value(self, compressed: bool = True, testnet: bool = False) -> bytes:
-        h160 = hashlib.new(
-            name="ripemd160",
-            data=hashlib.sha256(string=self.sec_value(compressed=compressed)).digest()
-        ).digest()
+        h160 = get_hash160(message=self.sec_value(compressed=compressed))
 
         if testnet:
             prefix = b'\x6f'

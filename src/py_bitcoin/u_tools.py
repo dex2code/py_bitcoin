@@ -1,12 +1,11 @@
+import hashlib
 import hmac
-from hashlib import sha256
-from typing import Union
+from typing import BinaryIO, Union
 
+import base58
 from requests import get as r_get
 
 from . import S256_N
-
-import base58
 
 
 def be_to_int(input_bytes: bytes) -> int:
@@ -49,14 +48,32 @@ def get_hash256(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
     else:
         raise TypeError("(u_tools.get_hash256) Input object should be <str> or <bytes>!")
     
-    first_hash = sha256(input_text).digest()
-    second_hash = sha256(first_hash).digest()
+    first_hash = hashlib.sha256(input_text).digest()
+    second_hash = hashlib.sha256(first_hash).digest()
 
     if to_int:
         final_hash = be_to_int(input_bytes=second_hash)
         return final_hash
     else:
         return second_hash
+    
+
+def get_hash160(message: Union[str, bytes]) -> bytes:
+    """
+    This function takes an arbitrary text or byte string as an argument
+    and returns sha256 hash followed by ripemd160.
+    """
+    if type(message) == str:
+        input_text = message.encode(encoding="utf-8")
+    elif type(message) == bytes:
+        input_text = message
+    else:
+        raise TypeError("(u_tools.get_hash160) Input object should be <str> or <bytes>!")
+
+    return hashlib.new(
+        'ripemd160',
+        hashlib.sha256(string=message).digest()
+    ).digest()
 
 
 def get_random_secret() -> int:
@@ -67,13 +84,13 @@ def get_random_secret() -> int:
     random_api = "https://www.random.org/integers/?num=32&min=0&max=255&col=32&base=16&format=plain&rnd=new"
 
     try:
-        get_r = r_get(url=random_api, timeout=5)
+        get_r = r_get(url=random_api, timeout=10)
         get_r.close()
     except Exception as E:
         raise RuntimeError("(u_tools.get_random_secret) Cannot get random secret. Try later.")
     
     if get_r.status_code != 200:
-        raise RuntimeError("(u_tools.get_random_secret) Cannot get random secret. Try later.")
+        raise RuntimeError(f"(u_tools.get_random_secret) Cannot get random secret (error='{get_r.status_code}'). Try later.")
     
     random_secret = ''.join(get_r.text.split())
     if len(random_secret) != 2 * 32:
@@ -102,7 +119,7 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
     message_hash_bytes = int_to_be(input_int=message_hash)
     private_key_bytes = int_to_be(input_int=private_key)
 
-    s256 = sha256
+    s256 = hashlib.sha256
 
     k = hmac.new(k, v + b'\x00' + private_key_bytes + message_hash_bytes, s256).digest()
     v = hmac.new(k, v, s256).digest()
@@ -121,6 +138,9 @@ def get_deterministic_k(private_key: int, message_hash: int) -> int:
 
 
 def wif_to_int(wif_key: str, compressed: bool = True, testnet: bool = False) -> int:
+    """
+    This function decodes WIF format from bytes to int value
+    """
     wif_bytes = base58.b58decode_check(v=wif_key)
 
     if testnet and wif_bytes[0:1] != b'\xef':
@@ -133,6 +153,45 @@ def wif_to_int(wif_key: str, compressed: bool = True, testnet: bool = False) -> 
         raise ValueError(f"(u_tools.wif_to_int) Last byte ({wif_bytes[-1:]}) is not '0x01' for {compressed=}")
     
     return be_to_int(input_bytes=wif_bytes[1:-1])
+
+
+def decode_varint(b: bytes) -> int:
+    i = b[0]
+
+    if i == 0xfd:
+        return le_to_int(input_bytes=b[1:3])
+    elif i == 0xfe:
+        return le_to_int(input_bytes=b[1:5])
+    elif i == 0xff:
+        return le_to_int(input_bytes=b[1:9])
+    else:
+        return int(i)
+    
+
+def encode_varint(i: int) -> bytes:
+    if i < 0xfd:
+        return bytes(i)
+    elif i < 0x10000:
+        return b'\xfd' + int_to_le(input_int=i, output_length=2)
+    elif i < 0x100000000:
+        return b'\xfe' + int_to_le(input_int=i, output_length=4)
+    elif i < 0x10000000000000000:
+        return b'\xff' + int_to_le(input_int=i, output_length=8)
+    else:
+        raise ValueError("(u_tools.encode_varint) Value too large.")
+
+
+def read_varint(stream: BinaryIO) -> int:
+    i = stream.read(1)[0]
+
+    if i == 0xfd:
+        return le_to_int(input_bytes=stream.read(2))
+    elif i == 0xfe:
+        return le_to_int(input_bytes=stream.read(4))
+    elif i == 0xff:
+        return le_to_int(input_bytes=stream.read(8))
+    else:
+        return int(i)
 
 
 if __name__ == "__main__":
