@@ -18,3 +18,7 @@ class Script:
         cmds = stream.read(script_len)
 
         return cls(cmds)
+
+
+if __name__ == "__main__":
+    pass

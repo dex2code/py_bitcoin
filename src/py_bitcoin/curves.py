@@ -121,7 +121,7 @@ class S256_Point(Point):
 
 
     def address_value(self, compressed: bool = True, testnet: bool = False) -> bytes:
-        h160 = get_hash160(message=self.sec_value(compressed=compressed))
+        h160 = get_hash160(message=self.sec_value(compressed=compressed), to_int=False)
 
         if testnet:
             prefix = b'\x6f'

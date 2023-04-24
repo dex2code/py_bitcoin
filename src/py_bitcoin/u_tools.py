@@ -52,13 +52,12 @@ def get_hash256(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
     second_hash = hashlib.sha256(first_hash).digest()
 
     if to_int:
-        final_hash = be_to_int(input_bytes=second_hash)
-        return final_hash
+        return be_to_int(input_bytes=second_hash)
     else:
         return second_hash
     
 
-def get_hash160(message: Union[str, bytes]) -> bytes:
+def get_hash160(message: Union[str, bytes], to_int=True) -> Union[int, bytes]:
     """
     This function takes an arbitrary text or byte string as an argument
     and returns sha256 hash followed by ripemd160.
@@ -70,10 +69,15 @@ def get_hash160(message: Union[str, bytes]) -> bytes:
     else:
         raise TypeError("(u_tools.get_hash160) Input object should be <str> or <bytes>!")
 
-    return hashlib.new(
+    final_hash = hashlib.new(
         'ripemd160',
         hashlib.sha256(string=message).digest()
     ).digest()
+
+    if to_int:
+        return be_to_int(input_bytes=final_hash)
+    else:
+        return final_hash
 
 
 def get_random_secret() -> int:

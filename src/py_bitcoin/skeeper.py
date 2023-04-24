@@ -152,3 +152,7 @@ class Secretary:
         total = (u * S256_G) + (v * public_key)
 
         return total.x.num == signature.r
+
+
+if __name__ == "__main__":
+    pass

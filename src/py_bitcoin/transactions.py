@@ -165,3 +165,7 @@ class TxOut:
         #result += self.script_pubkey.serialize()
 
         return result
+
+
+if __name__ == "__main__":
+    pass
