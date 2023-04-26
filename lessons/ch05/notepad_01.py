@@ -24,12 +24,7 @@ my_tx = Tx.parse(stream=stream)
 print(my_tx)
 """
 
-"""
 tx_id = "3f4735eb3beb164150000b90fba6055bcff7a08ecba9352b7d29f404a658d2c9"
 
 tx = Tx.fetch_from_explorer(tx_id=tx_id)
 print(tx)
-"""
-
-
-print(OP_CODE[97]['func'])

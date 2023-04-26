@@ -8,6 +8,9 @@ from .script import Script
 from .u_tools import *
 
 
+DEBUG = True
+
+
 class Tx:
 
     def __init__(self, version, ins, outs, locktime, testnet: bool = False):
@@ -23,20 +26,30 @@ class Tx:
         tx_outs = ""
 
         for tx_in in self.tx_ins:
-            tx_ins += tx_in.__repr__() + "\n"
+            tx_ins += " <= " + tx_in.__repr__() + "\n"
         
         for tx_out in self.tx_outs:
-            tx_outs += tx_out.__repr__() + "\n"
+            tx_outs += " => " + tx_out.__repr__() + "\n"
         
-        return f"tx: {self.tx_id()}\n" + \
-            f"version: {self.tx_version}\n" + \
-            f"tx_ins({len(self.tx_ins)}):\n{tx_ins}" + \
-            f"tx_outs({len(self.tx_outs)}):\n{tx_outs}" + \
-            f"locktime: {self.tx_locktime}"
+        return f"[TX]: {self.tx_id()}\n" + \
+            f"[VERSION]: {self.tx_version}\n" + \
+            f"[TX_IN]({len(self.tx_ins)}):\n{tx_ins}" + \
+            f"[TX_OUT]({len(self.tx_outs)}):\n{tx_outs}" + \
+            f"[LOCKTIME]: {self.tx_locktime}"
     
 
-    def serialize(self):
-        result = int_to_le(input_int=self.tx_version, output_length=TX_VERSION_SIZE)
+    def tx_hash(self, to_int: bool = True) -> Union[int, bytes]:
+        return get_hash256(message=self.serialize(), to_int=to_int)[::-1]
+
+
+    def tx_id(self) -> str:
+        return self.tx_hash(to_int=False).hex()
+
+
+    def serialize(self) -> bytes:
+        result = b''
+
+        result += int_to_le(input_int=self.tx_version, output_length=TX_VERSION_SIZE)
 
         result += encode_varint(i=len(self.tx_ins))
         for tx_in in self.tx_ins:
@@ -50,14 +63,6 @@ class Tx:
 
         return result
 
-
-    def tx_hash(self, to_int: bool = True):
-        return get_hash256(message=self.serialize()[::-1], to_int=to_int)
-
-
-    def tx_id(self):
-        return self.tx_hash(to_int=False).hex()
-    
 
     @classmethod
     def parse(cls, stream: BinaryIO, testnet: bool = False):
@@ -98,8 +103,12 @@ class Tx:
         
         try:
             tx = Tx.parse(stream=BytesIO(tx_raw), testnet=testnet)
+            got_tx_id = tx.tx_id()
         except Exception as E:
             raise ValueError(f"Cannot parse TX obtained from explorer.")
+        
+        if got_tx_id != tx_id:
+            raise ValueError(f"Got wrong TX '{got_tx_id}' (expected '{tx_id}')")
         
         return cls(tx.tx_version, tx.tx_ins, tx.tx_outs, tx.tx_locktime, tx.testnet)
 
@@ -119,7 +128,7 @@ class TxIn:
 
 
     def __repr__(self):
-        return f"{self.prev_tx.hex()}:{self.prev_index}"
+        return f"tx: {self.prev_tx.hex()}, idx: {self.prev_index}"
     
 
     @classmethod
@@ -132,10 +141,12 @@ class TxIn:
         return cls(prev_tx, prev_index, script_sig, sequence)
 
 
-    def serialize(self):
-        result = self.prev_tx[::-1]
+    def serialize(self) -> bytes:
+        result = b''
+
+        result += self.prev_tx[::-1]
         result += int_to_le(input_int=self.prev_index, output_length=TX_INPUT_PREV_INDEX_SIZE)
-        #result += self.script_sig.serialize()
+        result += self.script_sig.serialize()
         result += int_to_le(input_int=self.sequence, output_length=TX_INPUT_SEQUENCE_SIZE)
 
         return result
@@ -148,8 +159,8 @@ class TxOut:
         self.script_pubkey = script_pubkey
     
 
-    def __repr__(self):
-        return f"{self.amount}:{self.script_pubkey}"
+    def __repr__(self) -> str:
+        return f"{self.amount} SAT ({self.amount / 100_000_000} BTC) : {self.script_pubkey}"
     
 
     @classmethod
@@ -160,9 +171,11 @@ class TxOut:
         return cls(amount, script_pubkey)
     
 
-    def serialize(self):
-        result = int_to_le(input_int=self.amount, output_length=TX_OUTPUT_AMOUNT_SIZE)
-        #result += self.script_pubkey.serialize()
+    def serialize(self) -> bytes:
+        result = b''
+
+        result += int_to_le(input_int=self.amount, output_length=TX_OUTPUT_AMOUNT_SIZE)
+        result += self.script_pubkey.serialize()
 
         return result
 

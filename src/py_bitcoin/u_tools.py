@@ -174,7 +174,7 @@ def decode_varint(b: bytes) -> int:
 
 def encode_varint(i: int) -> bytes:
     if i < 0xfd:
-        return bytes(i)
+        return int_to_le(input_int=i, output_length=1)
     elif i < 0x10000:
         return b'\xfd' + int_to_le(input_int=i, output_length=2)
     elif i < 0x100000000:

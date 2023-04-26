@@ -1,6 +1,6 @@
 import unittest
-from py_bitcoin.fields import FieldElement
-from py_bitcoin.curves import Point
+from .py_bitcoin.fields import *
+from .py_bitcoin.curves import *
 
 
 class CryptoTest(unittest.TestCase):

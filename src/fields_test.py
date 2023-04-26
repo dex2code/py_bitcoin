@@ -1,5 +1,5 @@
 import unittest
-from py_bitcoin.fields import FieldElement
+from .py_bitcoin.fields import *
 
 
 class FieldsTest(unittest.TestCase):
